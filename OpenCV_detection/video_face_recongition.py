@@ -16,8 +16,11 @@
 
 import cv2 as cv
 import numpy as np
-
-
+import os
+import datetime
+VIDEO_NAME = "reallyreally.mp4"
+now = str(datetime.datetime.now())[:19].replace(' ', '-').replace(':', '-')
+DIRECTORY_NAME = now + '-' + VIDEO_NAME.split('.')[0]
 # this function return frame by play_speed
 def get_frame(video_capture, play_speed=1):
     curr_frame = video_capture.get(cv.CAP_PROP_POS_FRAMES)
@@ -42,7 +45,7 @@ def get_area_of_frame_face_recognition(img, face_cascade):
 
 # this function show image and quit when press q or end
 def show_img(img, faces):
-    if len(faces) is not 0:
+    if len(faces) != 0:
         for (x, y, w, h) in faces:
             cv.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 1)
     cv.imshow('hello', img)
@@ -50,21 +53,30 @@ def show_img(img, faces):
         return False
     else:
         return True
-# def save_cropped_img(img):
+
+def save_cropped_img(img, faces, sec):
+    if len(faces) != 0:
+        i = 0
+        for (x, y, w, h) in faces:
+            cv.imwrite(DIRECTORY_NAME + sec + str(i), img[y:y + h, x: x + w])
+            i += 1
+    if cv.waitKey(1) & 0xFF == ord('q'):
+        return False
+    else:
+        return True
 
 
 if __name__ == "__main__":
     # load video
-    VIDEO_NAME = "jongmin.mp4"
     m_video_capture = cv.VideoCapture(VIDEO_NAME)
-
     m_face_cascade = cv.CascadeClassifier('lbpcascade_frontalface_improved.xml')
     TOTAL_FRAME = m_video_capture.get(cv.CAP_PROP_FRAME_COUNT)
+
 
     while (m_video_capture.get(cv.CAP_PROP_POS_FRAMES) < TOTAL_FRAME):
         img, sec = get_frame(video_capture=m_video_capture, play_speed=10)
         faces_area = get_area_of_frame_face_recognition(img=img, face_cascade=m_face_cascade)
-        if len(faces_area) is not 0:
+        if len(faces_area) != 0:
             print(sec)
 
         # keyboard interrupt (q)
