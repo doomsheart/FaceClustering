@@ -20,7 +20,10 @@ import os
 import datetime
 VIDEO_NAME = "reallyreally.mp4"
 now = str(datetime.datetime.now())[:19].replace(' ', '-').replace(':', '-')
-DIRECTORY_NAME = now + '-' + VIDEO_NAME.split('.')[0]
+DIRECTORY_NAME = "Cropped_imgs/" + now + '-' + VIDEO_NAME.split('.')[0]
+if not os.path.exists(DIRECTORY_NAME):
+    os.makedirs(DIRECTORY_NAME)
+
 # this function return frame by play_speed
 def get_frame(video_capture, play_speed=1):
     curr_frame = video_capture.get(cv.CAP_PROP_POS_FRAMES)
@@ -58,7 +61,9 @@ def save_cropped_img(img, faces, sec):
     if len(faces) != 0:
         i = 0
         for (x, y, w, h) in faces:
-            cv.imwrite(DIRECTORY_NAME + sec + str(i), img[y:y + h, x: x + w])
+            print(DIRECTORY_NAME + "/" + str(sec).replace('.','_') + "_" + str(i) + ".jpg")
+            cv.imshow('hello', img[y:y + h, x: x + w])
+            cv.imwrite(DIRECTORY_NAME + "/" + str(sec).replace('.','_') + "_" + str(i) + ".jpg", img[y:y + h, x: x + w])
             i += 1
     if cv.waitKey(1) & 0xFF == ord('q'):
         return False
@@ -80,6 +85,8 @@ if __name__ == "__main__":
             print(sec)
 
         # keyboard interrupt (q)
-        if not show_img(img, faces_area):
+        # if not show_img(img, faces_area):
+        #     break
+        if not save_cropped_img(img, faces_area, sec):
             break
 
