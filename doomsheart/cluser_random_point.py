@@ -45,10 +45,10 @@ def silhouette(_centroid, _assignment, _points, _i):
     # function a is mean distance between x(i) and data in same cluster.
     def a(__i):
         _curr_cluster = _assignment[__i]
-        _x_point = _points[__i]
+        _i_th_point = _points[__i]
         _same_cluster_points = [p for a,p in zip(_assignment, _points) if a == _curr_cluster]
         try:
-            a_val = sum([distance(_s, _x_point) for _s in _same_cluster_points]) / (len(_same_cluster_points) - 1)
+            a_val = sum([distance(_s, _i_th_point) for _s in _same_cluster_points]) / (len(_same_cluster_points) - 1)
         except:
             print("======================a_val error======================")
             print(_centroid, _assignment, _points, _i)
@@ -155,6 +155,7 @@ while True:
         curr_evaluated = evaluate_cluster(_centroid=tmp_centroid,
                                           _assignment=tmp_assignment,
                                           _data=orbit_arr)
+        print(curr_evaluated)
         if (optimized_evaluated < curr_evaluated):
             print("changed. cluster_evaluated is " + str(optimized_evaluated) + " and curr_evaluated is " + str(curr_evaluated))
             optimized_centroid = tmp_centroid
