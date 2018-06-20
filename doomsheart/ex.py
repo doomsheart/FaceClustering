@@ -1,10 +1,28 @@
-arr_1 = []
-for i in range(100):
-    arr_1.append(i)
+import tensorflow as tf
 
-arr_2 = []
-for i in range(100,200):
-    arr_2.append(i)
+sess_ = tf.Session()
+input = [[-1, -1, -1],
+         [2, 2, 2],
+         [3, 3, 3],
+         [4, 4, 4],
+         [5, 5, 5],
+         [6, 6, 6]
+]
 
-k = [j for j, _ in zip(arr_1,arr_2) if j%2 is 0]
-print(k)
+a = tf.Variable(tf.slice(input, [0,0], [2, -1]))
+sess_ = tf.Session()
+init_op_ = tf.global_variables_initializer()
+sess_.run(init_op_)
+result = (sess_.run(a))
+expanded_vectors_ = tf.expand_dims(input, 1)
+re = sess_.run(expanded_vectors_)
+print((re))
+t = [2]
+print(t)
+print(sess_.run(tf.expand_dims(t, 0)))
+# for a in expanded_vectors_:
+#     print(a)
+# tf.slice(input, [1, 0, 0], [1, 2, 3]) ==> [[[3, 3, 3],
+#                                             [4, 4, 4]]]
+# tf.slice(input, [1, 0, 0], [2, 1, 3]) ==> [[[3, 3, 3]],
+                                           # [[5, 5, 5]]]

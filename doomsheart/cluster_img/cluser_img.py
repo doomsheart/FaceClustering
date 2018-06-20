@@ -4,16 +4,32 @@ import seaborn as sns
 import random
 import tensorflow as tf
 import math
-orbit_arr = []
-x_list = [2, 8]
-y_list = [2, 8]
-sign = [-1, 1]
-for i in range(1000):
-    orbit_arr.append(((x_list[(random.randrange(0, 2))] + sign[(random.randrange(0, 2))] * pow(random.random(), 2))
-                      , (y_list[(random.randrange(0, 2))] + sign[(random.randrange(0, 2))] * pow(random.random(), 2))))
-            
+import cv2 as cv
+import os
+import numpy as np
+IMG_PATH = "Cropped_imgs/2018-06-20-10-13-48-reallyreally/"
+file_list = os.listdir(IMG_PATH)
+file_list.sort()
+img_list = []
+for f in file_list:
+    img = cv.cvtColor(cv.imread(IMG_PATH + f), cv.COLOR_BGR2GRAY)
+    max_ = img.max()
+    img_info = [v / max_ for l in img for v in l]
+    img_list.append(img_info)
+
+
+orbit_arr = img_list
+# orbit_arr = []
+# x_list = [2, 8]
+# y_list = [2, 8]
+# sign = [-1, 1]
+# for i in range(1000):
+#     orbit_arr.append(((x_list[(random.randrange(0, 2))] + sign[(random.randrange(0, 2))] * pow(random.random(), 2))
+#                       , (y_list[(random.randrange(0, 2))] + sign[(random.randrange(0, 2))] * pow(random.random(), 2))))
+#
 def distance(pt_1, pt_2):
-    return math.sqrt((pt_1[0] - pt_2[0])**2 + (pt_1[1] - pt_2[1])**2)
+    dis_sq_list = [(x_1 - x_2)**2 for x_1, x_2 in zip(pt_1, pt_2)]
+    return math.sqrt(sum(dis_sq_list))
 
 # DB = (1/n)sum(max((sig_i + sig_j)/ d(c_i, c_j)))
 
@@ -89,6 +105,9 @@ def silhouette(_centroid, _assignment, _points, _i):
 
 
 def cluster_random_points(k_, points_):
+    print('k_ is ' + str(k_))
+    print('points is ')
+    # print(points_)
     vectors_ = tf.constant(points_)
     centroids_ = tf.Variable(tf.slice(tf.random_shuffle(vectors_), [0, 0], [k_, -1]))
     expanded_vectors_ = tf.expand_dims(vectors_, 0)
@@ -98,8 +117,10 @@ def cluster_random_points(k_, points_):
                                       , reduction_indices=[1]) for c in range(k_)], 0)
     update_centroids_ = tf.assign(centroids_, means_)
     init_op_ = tf.global_variables_initializer()
+
     sess_ = tf.Session()
     sess_.run(init_op_)
+
     for _ in range(100):
         _, centroid_values_, assignment_values_ = sess_.run([update_centroids_, centroids_, assignments_])
     return centroid_values_, assignment_values_
@@ -109,37 +130,12 @@ def evaluate_cluster(_centroid, _assignment, _data):
     # print(result)
     return result
 
-# # TODO
-# # make algorithm that find accurate cluster and evaluate db value so that find appropriate k
-# k = 3
-# result_cluster = cluster_random_points(k, orbit_arr)
-# while True:
-#     optimized_k_cluster_centroid_and_assignment = cluster_random_points(k, orbit_arr)
-#     for i in range(10):
-#         clustering_result = cluster_random_points(k, orbit_arr)
-#         if David_Bouldin_index(_centroid=optimized_k_cluster_centroid_and_assignment[0],
-#                                _assignment=optimized_k_cluster_centroid_and_assignment[1],
-#                                _data=orbit_arr) \
-#                 > \
-#                 David_Bouldin_index(_centroid=clustering_result[0],
-#                                     _assignment=clustering_result[1],
-#                                     _data=orbit_arr):
-#             optimized_k_cluster_centroid_and_assignment = clustering_result
-#     k += 1
-#     if David_Bouldin_index(_centroid=result_cluster[0],
-#                            _assignment=result_cluster[1],
-#                            _data=orbit_arr) \
-#             < David_Bouldin_index(_centroid=optimized_k_cluster_centroid_and_assignment[0],
-#                                   _assignment=optimized_k_cluster_centroid_and_assignment[1],
-#                                   _data=orbit_arr):
-#         break
-#     else:
-#         result_cluster = optimized_k_cluster_centroid_and_assignment
-
 # TODO
 # make algorithm that find accurate cluster and evaluate db value so that find appropriate k
-# silhouette(_centroid, _assignment, _points, _i):
+# silhouette(_centroid, _assignment, _points, _i)
 k = 1
+print("jwowowow")
+print(k)
 result_centroid, result_assignment = cluster_random_points(k, orbit_arr)
 result_evaluated = evaluate_cluster(_centroid=result_centroid, _assignment=result_assignment, _data=orbit_arr)
 
@@ -150,7 +146,7 @@ while True:
                                          _assignment=optimized_assignment,
                                          _data=orbit_arr)
     curr_evaluated = optimized_evaluated
-    for i in range(9):
+    for i in range(3):
         tmp_centroid, tmp_assignment = cluster_random_points(k, orbit_arr)
         curr_evaluated = evaluate_cluster(_centroid=tmp_centroid,
                                           _assignment=tmp_assignment,
@@ -174,13 +170,13 @@ while True:
         print(result_evaluated)
 k -= 2
 print("result k is " + str(k))
-data = {"x": [], "y": [], "cluster": []}
+# data = {"x": [], "y": [], "cluster": []}
 print(result_assignment)
-for i in range(len(result_assignment)):
-    data["x"].append(orbit_arr[i][0])
-    data["y"].append(orbit_arr[i][1])
-    data["cluster"].append(result_assignment[i])
+# for i in range(len(result_assignment)):
+#     data["x"].append(orbit_arr[i][0])
+#     data["y"].append(orbit_arr[i][1])
+#     data["cluster"].append(result_assignment[i])
 
-df = pd.DataFrame(data)
-sns.lmplot("x", "y", data=df, fit_reg=False, size=6, hue="cluster", legend=False)
-plt.show()
+# df = pd.DataFrame(data)
+# sns.lmplot("x", "y", data=df, fit_reg=False, size=6, hue="cluster", legend=False)
+# plt.show()
