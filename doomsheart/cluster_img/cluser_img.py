@@ -7,6 +7,7 @@ import math
 import cv2 as cv
 import os
 import numpy as np
+from shutil import copyfile
 IMG_PATH = "Cropped_imgs/2018-06-20-10-13-48-reallyreally/"
 file_list = os.listdir(IMG_PATH)
 file_list.sort()
@@ -16,8 +17,7 @@ for f in file_list:
     max_ = img.max()
     img_info = [v / max_ for l in img for v in l]
     img_list.append(img_info)
-
-
+print(file_list)
 orbit_arr = img_list
 # orbit_arr = []
 # x_list = [2, 8]
@@ -133,45 +133,46 @@ def evaluate_cluster(_centroid, _assignment, _data):
 # TODO
 # make algorithm that find accurate cluster and evaluate db value so that find appropriate k
 # silhouette(_centroid, _assignment, _points, _i)
-k = 1
+k = 4
 print("jwowowow")
 print(k)
 result_centroid, result_assignment = cluster_random_points(k, orbit_arr)
 result_evaluated = evaluate_cluster(_centroid=result_centroid, _assignment=result_assignment, _data=orbit_arr)
-
-while True:
-    print("k is " + str(k))
-    optimized_centroid, optimized_assignment = cluster_random_points(k, orbit_arr)
-    optimized_evaluated = evaluate_cluster(_centroid=optimized_centroid,
-                                         _assignment=optimized_assignment,
-                                         _data=orbit_arr)
-    curr_evaluated = optimized_evaluated
-    for i in range(3):
-        tmp_centroid, tmp_assignment = cluster_random_points(k, orbit_arr)
-        curr_evaluated = evaluate_cluster(_centroid=tmp_centroid,
-                                          _assignment=tmp_assignment,
-                                          _data=orbit_arr)
-        print(curr_evaluated)
-        if (optimized_evaluated < curr_evaluated):
-            print("changed. cluster_evaluated is " + str(optimized_evaluated) + " and curr_evaluated is " + str(curr_evaluated))
-            optimized_centroid = tmp_centroid
-            optimized_assignment = tmp_assignment
-            optimized_evaluated = curr_evaluated
-    k += 1
-    cmp_cluster_evaluated = evaluate_cluster(_centroid=optimized_centroid,
-                                             _assignment=optimized_assignment,
-                                             _data=orbit_arr)
-    if result_evaluated > optimized_evaluated :
-        break
-    else:
-        print(k)
-        result_centroid, result_assignment = optimized_centroid, optimized_assignment
-        result_evaluated = optimized_evaluated
-        print(result_evaluated)
-k -= 2
-print("result k is " + str(k))
-# data = {"x": [], "y": [], "cluster": []}
+print(orbit_arr)
 print(result_assignment)
+# while True:
+#     print("k is " + str(k))
+#     optimized_centroid, optimized_assignment = cluster_random_points(k, orbit_arr)
+#     optimized_evaluated = evaluate_cluster(_centroid=optimized_centroid,
+#                                          _assignment=optimized_assignment,
+#                                          _data=orbit_arr)
+#     curr_evaluated = optimized_evaluated
+#     for i in range(3):
+#         tmp_centroid, tmp_assignment = cluster_random_points(k, orbit_arr)
+#         curr_evaluated = evaluate_cluster(_centroid=tmp_centroid,
+#                                           _assignment=tmp_assignment,
+#                                           _data=orbit_arr)
+#         print(curr_evaluated)
+#         if (optimized_evaluated < curr_evaluated):
+#             print("changed. cluster_evaluated is " + str(optimized_evaluated) + " and curr_evaluated is " + str(curr_evaluated))
+#             optimized_centroid = tmp_centroid
+#             optimized_assignment = tmp_assignment
+#             optimized_evaluated = curr_evaluated
+#     k += 1
+#     cmp_cluster_evaluated = evaluate_cluster(_centroid=optimized_centroid,
+#                                              _assignment=optimized_assignment,
+#                                              _data=orbit_arr)
+#     if result_evaluated > optimized_evaluated :
+#         break
+#     else:
+#         print(k)
+#         result_centroid, result_assignment = optimized_centroid, optimized_assignment
+#         result_evaluated = optimized_evaluated
+#         print(result_evaluated)
+# k -= 2
+# print("result k is " + str(k))
+# data = {"x": [], "y": [], "cluster": []}
+print(len(result_assignment))
 # for i in range(len(result_assignment)):
 #     data["x"].append(orbit_arr[i][0])
 #     data["y"].append(orbit_arr[i][1])
@@ -180,3 +181,8 @@ print(result_assignment)
 # df = pd.DataFrame(data)
 # sns.lmplot("x", "y", data=df, fit_reg=False, size=6, hue="cluster", legend=False)
 # plt.show()
+for n in range(4):
+    if not os.path.exists(str(n)):
+        os.makedirs(str(n))
+for n,a in zip(file_list, result_assignment):
+    copyfile(IMG_PATH + n, str(a) + '/' + n)
