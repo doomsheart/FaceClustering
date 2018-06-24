@@ -485,4 +485,4 @@ paket-files/
 
 # End of https://www.gitignore.io/api/python,opencv,pycharm,visualstudio,visualstudiocode 
 
-OpenCV_detection/Cropped_imgs/
+Cropped_imgs/
