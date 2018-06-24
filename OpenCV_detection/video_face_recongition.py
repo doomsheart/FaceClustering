@@ -18,7 +18,7 @@ import cv2 as cv
 import numpy as np
 import os
 import datetime
-VIDEO_NAME = "reallyreally.mp4"
+VIDEO_NAME = "WINNER.mp4"
 now = str(datetime.datetime.now())[:19].replace(' ', '-').replace(':', '-')
 DIRECTORY_NAME = "Cropped_imgs/" + now + '-' + VIDEO_NAME.split('.')[0]
 if not os.path.exists(DIRECTORY_NAME):
@@ -34,15 +34,16 @@ def get_frame(video_capture, play_speed=1):
 
 
 # this function return detect or unable to detect ,rectangle marked image
-def get_area_of_frame_face_recognition(img, face_cascade):
+def get_area_of_frame_face_recognition(img, face_cascade, eye_cascade):
     grayed_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
 
     # def detectMultiScale(self, image, scaleFactor=None, minNeighbors=None, flags=None, minSize=None, maxSize=None)
     face_area = face_cascade.detectMultiScale(image=grayed_img,scaleFactor=1.3,minNeighbors=5)
-    # for (x, y, w, h) in faces:
-    #     cv.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 1)
-    #     roi_gray = grayed_img[y:y + h, x:x + w]
-    #     roi_color = img[y:y + h, x:x + w]
+    for (x, y, w, h) in face_area:
+        cv.rectangle(img, (x, y), (x + w, y + h), (255, 0, 0), 1)
+        roi_gray = grayed_img[y:y + h, x:x + w]
+        roi_color = img[y:y + h, x:x + w]
+
     return face_area
 
 
@@ -85,8 +86,8 @@ if __name__ == "__main__":
             print(sec)
 
         # keyboard interrupt (q)
-        # if not show_img(img, faces_area):
-        #     break
-        if not save_cropped_img(img, faces_area, sec):
+        if not show_img(img, faces_area):
             break
+        # if not save_cropped_img(img, faces_area, sec):
+        #     break
 
