@@ -18,7 +18,7 @@ import cv2 as cv
 import numpy as np
 import os
 import datetime
-VIDEO_NAME = "WINNER.mp4"
+VIDEO_NAME = "sample.mp4"
 now = str(datetime.datetime.now())[:19].replace(' ', '-').replace(':', '-')
 DIRECTORY_NAME = "Cropped_imgs/" + now + '-' + VIDEO_NAME.split('.')[0]
 if not os.path.exists(DIRECTORY_NAME):
